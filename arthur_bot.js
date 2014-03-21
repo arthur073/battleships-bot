@@ -33,6 +33,7 @@
 
 	// Variables for moves
 	var probabilities = [];
+	var shipsDestroyed = [];
 
 
 	// Checking if we can assign a ship to a given position
@@ -124,6 +125,7 @@
 		        positions[y][x] = null;
 		    }
 		}
+
 	
 		// getting hit positions
 		for (var i=0; i < json.hit.length; i++) {
@@ -134,7 +136,11 @@
 		for (var i=0; i < json.missed.length; i++) {
 			positions[Math.floor(json.missed[i] / 10)][ json.missed[i] % 10] = 1;
 		}
-		//console.log(Math.floor(json.hit[6] / 10));
+		// getting destroyed ships
+		for (var i=0; i < json.destroyed.length; i++) {
+			shipsDestroyed.push(json.destroyed[i]);
+		}
+
 	}
 
 
@@ -154,6 +160,18 @@
 			    else probabilities[i][y]++;
 			}
 		}
+
+
+		// Checks if ship is not destroyed			
+		function shipIsStillAlive(ship_size) {
+		
+			if (shipsDestroyed.indexOf(ship_size) > -1) {
+				// The ship has been destroyed ! 
+				return false;
+			}		
+			return true;
+		}		
+
 
 		function skewProbabilityAroundHits(toSkew) {
 			var uniques = [];
@@ -200,17 +218,19 @@
 		        }
 		    }
 		}
+		
+
 
 		// calculate probabilities for each type of ship
 		for (var i = 0, l = ships.length; i < l; i++) {
 		    for (var y = 0; y < boardSize; y++) {
 		        for (var x = 0; x < boardSize; x++) {
 		            // horizontal check
-		            if (shipCanOccupyPosition(1, [x, y], ships[i], false)) {
+		            if (shipIsStillAlive(ships[i]) && shipCanOccupyPosition(1, [x, y], ships[i], false)) {
 		                increaseProbability([x, y], ships[i], false);
 		            }
 		            // vertical check
-		            if (shipCanOccupyPosition(1, [x, y], ships[i], true)) {
+		            if (shipIsStillAlive(ships[i]) && shipCanOccupyPosition(1, [x, y], ships[i], true)) {
 		                increaseProbability([x, y], ships[i], true);
 		            }
 		        }
