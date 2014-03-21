@@ -1,5 +1,8 @@
 /**
- * Just to show BigBot he should really place his bots randomly !
+ * Arthur's bot.
+ *
+ * TODO:
+ *  - better use of probabilities when boats start to be destroyed
  */
 
 
@@ -125,7 +128,9 @@
 		        positions[y][x] = null;
 		    }
 		}
+		
 
+		// Debug only, console.log(json.hit.length + json.missed.length);
 	
 		// getting hit positions
 		for (var i=0; i < json.hit.length; i++) {
