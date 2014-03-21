@@ -127,14 +127,14 @@
 	
 		// getting hit positions
 		for (var i=0; i < json.hit.length; i++) {
-			positions[Math.round(json.hit[i] / 10)][ json.hit[i] % 10] = 2;
+			positions[Math.floor(json.hit[i] / 10)][ json.hit[i] % 10] = 2;
 		}
 
 		// getting missed positions
 		for (var i=0; i < json.missed.length; i++) {
-			positions[Math.round(json.missed[i] / 10)][ json.missed[i] % 10] = 1;
+			positions[Math.floor(json.missed[i] / 10)][ json.missed[i] % 10] = 1;
 		}
-		//console.log(positions);
+		//console.log(Math.floor(json.hit[6] / 10));
 	}
 
 
@@ -176,8 +176,6 @@
 			    toSkew = toSkew.concat(getAdjacentPositions(toSkew[i]));
 			}
 
-			// store uniques to avoid skewing positions multiple times
-			// TODO: do A/B testing to see if doing this with strings is efficient
 			for (var i = 0, l = toSkew.length; i < l; i++) {
 			    var uniquesStr = uniques.join('|').toString();
 			    if (uniquesStr.indexOf(toSkew[i].toString()) === -1) {
@@ -268,9 +266,7 @@
 			// That's the real game we are talking about !
 			parseInput(input);
 			recalculateProbabilities();
-			console.log(JSON.stringify(getBestUnplayedPosition()));
-
-			
+			console.log(JSON.stringify(getBestUnplayedPosition()));	
 		}
 	}
 
