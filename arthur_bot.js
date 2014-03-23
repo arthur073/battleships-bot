@@ -9,9 +9,9 @@
 	// Getting argument
 	var input = JSON.parse(process.argv.slice(2));
 
-	// Specific case for BigBot
-	var fight_against_bigbot = false;
-	var moves_for_bigbot = [
+	// Specific case for Stab
+	var fight_against_stab = true;
+	var moves_for_stab = [
 		"22", 
 		"23", // Size 2 sunk ! 
 		"53", 
@@ -115,7 +115,7 @@
 		    jsonData["orientation"] = vertical ? "vertical" : "horizontal";
 		    jsonMessage[(ships[i]).toString()] = jsonData;            
 		}
-		console.log(jsonMessage);
+		console.log(JSON.stringify(jsonMessage));
 	}
 
 
@@ -130,7 +130,7 @@
 		}
 		
 
-		// Debug only, console.log(json.hit.length + json.missed.length);
+		console.log(json.hit.length + json.missed.length);
 	
 		// getting hit positions
 		for (var i=0; i < json.hit.length; i++) {
@@ -249,19 +249,89 @@
 	}
 
 
+	// Checking if this position is worth playing
+	function isPositionValid(x,y) {	
+		var ableToPlaceAShip = false; 
+
+		if (shipsDestroyed.length = 4) {
+			// Every ship is destroyed, return true
+			return true;		
+		}	
+	
+		// For each alive ship
+		for (var i = 0; i < ships.length; i++) {
+			if (shipsDestroyed.indexOf(ships[i].toString()) == -1) {
+				var min_align = ships[i];		
+				var cpt_l = 0;			
+				var cpt_r = 0;
+				var cpt_u = 0;
+				var cpt_d = 0;
+
+
+
+				// Exploring right
+				while(cpt_r <= min_align && (x+cpt_r < boardSize) && (positions[x+cpt_r][y] != 1)) {
+					cpt_r++;
+				}
+				// Exploring left
+				while(cpt_l <= min_align && (x-cpt_l >= 0) && (positions[x-cpt_l][y] != 1)) {
+					cpt_l++;
+				}
+				// Exploring down
+				while(cpt_d <= min_align && (y+cpt_d < boardSize) && (positions[x][y+cpt_d] != 1)) {
+					cpt_d++;
+				}
+				// Exploring up
+				while(cpt_u <= min_align && (y-cpt_u >= 0) && (positions[x][y-cpt_u] != 1)) {
+					cpt_u++;
+				}
+				console.log("For ship #" + min_align);
+				console.log("  left : "+cpt_l);
+				console.log("  right: "+cpt_r);
+				console.log("  up   : "+cpt_u);
+				console.log("  down : "+cpt_d);
+
+				
+				if (((cpt_l+cpt_r-1)>=min_align) || ((cpt_u+cpt_d-1)>=min_align)) {
+					// we can place a ship !
+					console.log("OK for #"+min_align); 
+					ableToPlaceAShip = true;
+				}
+			}
+		}
+		//console.log(positions);
+		return ableToPlaceAShip;
+	}
+
+
 
         function getBestUnplayedPosition() {
-		var bestProb = 0,
+		var bestProb = 0, found = false,
 		    bestPos;
 
-		for (var y = 0; y < boardSize; y++) {
-		    for (var x = 0; x < boardSize; x++) {
-		        if (!positions[x][y] && probabilities[x][y] > bestProb) {
-		            bestProb = probabilities[x][y];
-		            bestPos = [x, y];
-		        }
-		    }
+		while(!found) {
+		console.log(probabilities);
+			// Getting the best probability of the board
+			for (var y = 0; y < boardSize; y++) {
+			    for (var x = 0; x < boardSize; x++) {
+				if (!positions[x][y] && positions[x][y] != 3 && probabilities[x][y] > bestProb) {
+				    bestProb = probabilities[x][y];
+				    bestPos = [x, y];
+				}
+			    }
+			}
+			// We found one position
+			found = true;
+			console.log("found : " + bestPos);
+	
+			if (!isPositionValid(bestPos[0],bestPos[1])) {
+				// We need to mark the position as unvalid (3)
+				positions[bestPos[0]][bestPos[1]] = 3;
+				found = false;
+				console.log("Unvalid: X:"+bestPos[0].toString() + " Y:" + bestPos[1].toString());
+			}
 		}
+
 
 		var jsonData = {};
         	jsonData["move"] = bestPos[0].toString() + bestPos[1].toString();
@@ -277,15 +347,15 @@
 		// Creating a random config
 		distributeShips();
 	} else {
-		if (fight_against_bigbot) {	
+		if (fight_against_stab) {	
 			// Checking which moves were played
 			var index = 0;	
-			while (input.hit.indexOf(moves_for_bigbot[index]) > -1 || input.missed.indexOf(moves_for_bigbot[index]) > -1) {
+			while (input.hit.indexOf(moves_for_stab[index]) > -1 || input.missed.indexOf(moves_for_stab[index]) > -1) {
 				index++;
 			}
 			// Playing recorded move
 			console.log(JSON.stringify({
-				move: moves_for_bigbot[index]
+				move: moves_for_stab[index]
 			}));
 		} else {
 			// That's the real game we are talking about !
