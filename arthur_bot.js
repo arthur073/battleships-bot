@@ -13,7 +13,7 @@
 	// 0 - regular
 	// 1 - against Stab
 	// 2 - against BigBot
-	var fight_type = 2; 
+	var fight_type = 0; 
 
 	if (fight_type == 1) {
 		// fighting Stab
@@ -157,7 +157,7 @@
 		}
 		
 
-		console.log(json.hit.length + json.missed.length);
+		//console.log(json.hit.length + json.missed.length);
 	
 		// getting hit positions
 		for (var i=0; i < json.hit.length; i++) {
@@ -280,48 +280,56 @@
 	function isPositionValid(x,y) {	
 		var ableToPlaceAShip = false; 
 
-		if (shipsDestroyed.length = 4) {
+		if (shipsDestroyed.length == 4) {
 			// Every ship is destroyed, return true
 			return true;		
 		}	
-	
+
 		// For each alive ship
 		for (var i = 0; i < ships.length; i++) {
 			if (shipsDestroyed.indexOf(ships[i].toString()) == -1) {
-				var min_align = ships[i];		
-				var cpt_l = 0;			
-				var cpt_r = 0;
-				var cpt_u = 0;
-				var cpt_d = 0;
-
-
+				var min_align = ships[i];					
+				var cpt_r = 1;
+				var cpt_l = 1;
+				var cpt_d = 1;
+				var cpt_u = 1;				
+				var space_r = 0;
+				var space_l = 0;
+				var space_d = 0;
+				var space_u = 0;
+			
 
 				// Exploring right
 				while(cpt_r <= min_align && (x+cpt_r < boardSize) && (positions[x+cpt_r][y] != 1)) {
+					space_r++;
 					cpt_r++;
 				}
 				// Exploring left
 				while(cpt_l <= min_align && (x-cpt_l >= 0) && (positions[x-cpt_l][y] != 1)) {
+					space_l++;					
 					cpt_l++;
 				}
+				
 				// Exploring down
 				while(cpt_d <= min_align && (y+cpt_d < boardSize) && (positions[x][y+cpt_d] != 1)) {
+					space_d++;
 					cpt_d++;
 				}
 				// Exploring up
 				while(cpt_u <= min_align && (y-cpt_u >= 0) && (positions[x][y-cpt_u] != 1)) {
+					space_u++;					
 					cpt_u++;
 				}
-				console.log("For ship #" + min_align);
-				console.log("  left : "+cpt_l);
-				console.log("  right: "+cpt_r);
-				console.log("  up   : "+cpt_u);
-				console.log("  down : "+cpt_d);
+				//console.log("For ship #" + min_align);
+				//console.log("  left : "+space_l);
+				//console.log("  right: "+space_r);
+				//console.log("  up   : "+space_u);
+				//console.log("  down : "+space_d);
 
 				
-				if (((cpt_l+cpt_r-1)>=min_align) || ((cpt_u+cpt_d-1)>=min_align)) {
+				if (((space_l+space_r+1)>=min_align) || ((space_u+space_d+1)>=min_align)) {
 					// we can place a ship !
-					console.log("OK for #"+min_align); 
+					//console.log("OK for #"+min_align); 
 					ableToPlaceAShip = true;
 				}
 			}
@@ -337,7 +345,7 @@
 		    bestPos;
 
 		while(!found) {
-		console.log(probabilities);
+		//console.log(probabilities);
 			// Getting the best probability of the board
 			for (var y = 0; y < boardSize; y++) {
 			    for (var x = 0; x < boardSize; x++) {
@@ -349,14 +357,17 @@
 			}
 			// We found one position
 			found = true;
-			console.log("found : " + bestPos);
-	
+			//console.log("found : " + positions[bestPos[0]][bestPos[1]]);
+			//console.log("prob : " + bestProb);
 			if (!isPositionValid(bestPos[0],bestPos[1])) {
 				// We need to mark the position as unvalid (3)
 				positions[bestPos[0]][bestPos[1]] = 3;
+				probabilities[bestPos[0]][bestPos[1]] = 0;
+				bestProb = 0;
 				found = false;
-				console.log("Unvalid: X:"+bestPos[0].toString() + " Y:" + bestPos[1].toString());
+				//console.log("Unvalid: X:"+bestPos[0].toString() + " Y:" + bestPos[1].toString());
 			}
+
 		}
 
 
