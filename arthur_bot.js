@@ -9,24 +9,51 @@
 	// Getting argument
 	var input = JSON.parse(process.argv.slice(2));
 
-	// Specific case for Stab
-	var fight_against_stab = true;
-	var moves_for_stab = [
-		"22", 
-		"23", // Size 2 sunk ! 
-		"53", 
-		"54",
-		"55", // Size 3 sunk !
-		"47",
-		"57",
-		"67",
-		"77", // Size 4 sunk ! 
-		"00",
-		"10",
-		"20",
-		"30",
-		"40"  // Size 5 sunk !
-	];
+	// Specific case for Stab/BigBot
+	// 0 - regular
+	// 1 - against Stab
+	// 2 - against BigBot
+	var fight_type = 2; 
+
+	if (fight_type == 1) {
+		// fighting Stab
+		var moves = [
+			"22", 
+			"23", // Size 2 sunk ! 
+			"53", 
+			"54",
+			"55", // Size 3 sunk !
+			"47",
+			"57",
+			"67",
+			"77", // Size 4 sunk ! 
+			"00",
+			"10",
+			"20",
+			"30",
+			"40"  // Size 5 sunk !
+		];
+	} else if (fight_type == 2) {
+		// fighting BigBot
+		var moves = [
+			"00", 
+			"01", // Size 2 sunk ! 
+			"51", 
+			"61",
+			"71", // Size 3 sunk !
+			"22",
+			"23",
+			"24",
+			"25", // Size 4 sunk ! 
+			"37",
+			"47",
+			"57",
+			"67",
+			"77"  // Size 5 sunk !
+		];
+
+
+	}
 
 
 	// Variables for setup
@@ -347,15 +374,16 @@
 		// Creating a random config
 		distributeShips();
 	} else {
-		if (fight_against_stab) {	
+		if (fight_type != 0) {	
+			// Cheat fight ! 
 			// Checking which moves were played
 			var index = 0;	
-			while (input.hit.indexOf(moves_for_stab[index]) > -1 || input.missed.indexOf(moves_for_stab[index]) > -1) {
+			while (input.hit.indexOf(moves[index]) > -1 || input.missed.indexOf(moves[index]) > -1) {
 				index++;
 			}
 			// Playing recorded move
 			console.log(JSON.stringify({
-				move: moves_for_stab[index]
+				move: moves[index]
 			}));
 		} else {
 			// That's the real game we are talking about !
